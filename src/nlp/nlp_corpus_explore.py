@@ -197,6 +197,27 @@ for category in token_df["category"].unique().to_list():
     # Show results for this category
     print(f"{category.upper()} top tokens: {top_tokens_list}")
 
+# ============================================================
+# Vocabulary Diversity Analysis - Brandon Smith
+# ============================================================
+
+vocabulary_diversity_df = (
+    token_df.group_by("category")
+    .agg(
+        pl.len().alias("total_words"),
+        pl.col("token").n_unique().alias("unique_words"),
+    )
+    .with_columns(
+        (pl.col("unique_words") / pl.col("total_words") * 100)
+        .round(2)
+        .alias("diversity_percent")
+    )
+    .sort("category")
+)
+
+print("\nVocabulary Diversity by Category:")
+print(vocabulary_diversity_df)
+
 
 # ============================================================
 # Section 7. Analyze Co-occurrence (Context Windows)
@@ -318,9 +339,11 @@ print("- Co-occurrence reveals contextual relationships between words.")
 print("- Bigrams capture local structure beyond single tokens.")
 print("- Patterns emerge before any machine learning is applied.")
 
-print("\nYOURNAME SPECIFIC OBSERVATIONS:")
-print("TODO")
-
+print("\nBRANDON SMITH SPECIFIC OBSERVATIONS:")
+print("- Truck has the highest vocabulary diversity at 70.59%.")
+print("- Dog has the lowest vocabulary diversity at 50.00%.")
+print("- Vocabulary diversity helps compare word variety across categories.")
+print("- Smaller categories can have higher diversity percentages.")
 
 # ============================================================
 # END
